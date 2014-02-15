@@ -6,6 +6,7 @@ public class Room {
 
 	private Integer codRoom = null;
 	private String nameRoom;
+	private Building building;
 	private List<Room> neighbors;
 	
 	public Room(Integer codRoom, String nameRoom) {
@@ -18,8 +19,7 @@ public class Room {
 	public Room(String nameRoom) {
 		this.nameRoom = nameRoom;
 	}
-
-	// Getters
+			
 	public Integer getCodRoom() {
 		return codRoom;
 	}
@@ -28,11 +28,14 @@ public class Room {
 		return nameRoom;
 	}
 
+	public Building getBuilding() {
+		return building;
+	}
+
 	public List<Room> getNeighbors() {
 		return neighbors;
 	}
 
-	// Setters
 	public void setCodRoom(Integer codRoom) {
 		this.codRoom = codRoom;
 	}
@@ -41,10 +44,14 @@ public class Room {
 		this.nameRoom = nameRoom;
 	}
 
+	public void setBuilding(Building building) {
+		this.building = building;
+	}
+
 	public void setNeighbors(List<Room> neighbors) {
 		this.neighbors = neighbors;
 	}
-	
+
 	public void addNeighbor(Room neighbor) {
 		neighbors.add(neighbor);
 	}

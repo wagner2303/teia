@@ -9,6 +9,7 @@ public class Building {
 	private List<Room> rooms;
 	private List<Router> routers;
 	
+	
 	public Building() {
 		super();
 		// TODO Auto-generated constructor stub

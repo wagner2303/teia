@@ -11,35 +11,73 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	private static final String name = "datamanager.db";
 
 	// Table names
+	private static final String TABLE_BUILDINGS = "buildings";
+	private static final String TABLE_BUILDINGSCOMPLEXES = "buildingscomplexes";
+	private static final String TABLE_PERCEIVEDROUTERS = "perceivedrouters";
 	private static final String TABLE_ROOMS = "rooms";
-	private static final String TABLE_WIFINETWORKS = "wifinetworks";
-	private static final String TABLE_DADOS = "dados";
+	private static final String TABLE_ROUTERS = "routers";
 
+	// BUILDINGS COLUMNS
+	private static final String COLUMN_BUILDINGS_ID = "idbuilding";
+	private static final String COLUMN_BUILDINGS_NAME = "namebuilding";
+	
+	// BUILDINGSCOMPLEXES COLUMNS
+	private static final String COLUMN_BUILDINGSCOMPLEXES_ID = "idBuildingComplexes";
+	private static final String COLUMN_BUILDINGSCOMPLEXES_NAME = "nameBuildingComplexes";
+	
+	// PERCEIVEDROUTER COLUMNS
+	private static final String COLUMN_PERCEIVEDROUTERS_DATE = "datePerceivedRouter";
+	private static final String COLUMN_PERCEIVEDROUTERS_SIGNALLEVEL = "signalLevel";
+	
 	// ROOMS COLUMNS
-	private static final String COLUMN_ROOM_ID = "codroom";
+	private static final String COLUMN_ROOM_ID = "idroom";
 	private static final String COLUMN_ROOM_NAME = "nameroom";
-
-	// WIFINETWORKS COLUMNS
-	private static final String COLUMN_WIFINETWORKS_ID = "codwifi";
-	// DADOS COLUMNS
-	private static final String COLUMN_DADOS_DATA = "data";
-	private static final String COLUMN_DADOS_SIGNALLEVEL = "signallevel";
+	
+	// ROUTERS COLUMNS
+	private static final String COLUMN_ROUTERS_ID = "idRouter";
+	private static final String COLUMN_ROUTERS_NAME = "nameRouter";
+	private static final String COLUMN_ROUTERS_MAC = "macRouter";
 
 	// Table Create Statements
 
+	// BuildingsComplexes Table
+	private static final String CREATE_TABLE_BUILDINGSCOMPLEXES = "create table " + TABLE_BUILDINGSCOMPLEXES + " ( "
+			+ COLUMN_BUILDINGSCOMPLEXES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ COLUMN_BUILDINGSCOMPLEXES_NAME + " TEXT NOT NULL "
+			+ ")";
+	// Buildings Table
+	private static final String CREATE_TABLE_BUILDINGS = "create table " + TABLE_BUILDINGS + " ( "
+			+ COLUMN_BUILDINGS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ COLUMN_BUILDINGS_NAME + " TEXT NOT NULL, "
+			+ COLUMN_BUILDINGSCOMPLEXES_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_BUILDINGSCOMPLEXES + "(" + COLUMN_BUILDINGSCOMPLEXES_ID + ")"
+			+ ")";
+	// PerceivedRouters
+	private static final String CREATE_TABLE_PERCEIVEDROUTERS = "create table " + TABLE_PERCEIVEDROUTERS + " ( "
+			+ COLUMN_PERCEIVEDROUTERS_DATE + " INTEGER PRIMARY KEY, "
+			+ COLUMN_ROOM_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_ROOMS + "(" + COLUMN_ROOM_ID + "), "
+			+ COLUMN_ROUTERS_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_ROUTERS + "(" + COLUMN_ROUTERS_ID + "), "
+			+ COLUMN_PERCEIVEDROUTERS_SIGNALLEVEL + " INTEGER NOT NULL "
+			+ ")";
 	// Rooms Table
 	private static final String CREATE_TABLE_ROOMS = "create table " + TABLE_ROOMS + " ( "
 			+ COLUMN_ROOM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ COLUMN_ROOM_NAME + " TEXT not null"
+			+ COLUMN_ROOM_NAME + " TEXT not null, "
+			+ COLUMN_BUILDINGS_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_BUILDINGS + "(" + COLUMN_BUILDINGS_ID + ")"
 			+ ")";
-
-	// Dados Table
-	private static final String CREATE_TABLE_DADOS = "create table " + TABLE_DADOS + " ( "
-			+ COLUMN_DADOS_DATA + " LONG not null, "
-			+ COLUMN_ROOM_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_ROOMS + "(" + COLUMN_ROOM_ID + "), "
-			+ COLUMN_WIFINETWORKS_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_WIFINETWORKS + "(" + COLUMN_WIFINETWORKS_ID + "), "
-			+ COLUMN_DADOS_SIGNALLEVEL + " INTEGER not null "
+	private static final String CREATE_TABLE_ROUTERS = "create table " + TABLE_ROUTERS + " ( "
+			+ COLUMN_ROUTERS_ID + " INTEGER PRIMARY KEY AUTO INCREMENT, "
+			+ COLUMN_ROUTERS_NAME + " TEXT, "
+			+ COLUMN_ROUTERS_MAC + " TEXT NOT NULL, "
+			+ COLUMN_BUILDINGS_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_BUILDINGS + "(" + COLUMN_BUILDINGS_ID + ")"
 			+ ")";
+//
+//	// Dados Table
+//	private static final String CREATE_TABLE_DADOS = "create table " + TABLE_DADOS + " ( "
+//			+ COLUMN_DADOS_DATA + " LONG not null, "
+//			+ COLUMN_ROOM_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_ROOMS + "(" + COLUMN_ROOM_ID + "), "
+//			+ COLUMN_WIFINETWORKS_ID + " INTEGER FOREIGN KEY REFERENCES " + TABLE_WIFINETWORKS + "(" + COLUMN_WIFINETWORKS_ID + "), "
+//			+ COLUMN_DADOS_SIGNALLEVEL + " INTEGER not null "
+//			+ ")";
 
 	public DatabaseHelper(Context context) {
 		super(context, name, null, version);
@@ -48,9 +86,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// creating tables
+		db.execSQL(CREATE_TABLE_BUILDINGSCOMPLEXES);
+		db.execSQL(CREATE_TABLE_BUILDINGS);
 		db.execSQL(CREATE_TABLE_ROOMS);
-		db.execSQL(CREATE_TABLE_DADOS);
-
+		db.execSQL(CREATE_TABLE_ROUTERS);
+		db.execSQL(CREATE_TABLE_PERCEIVEDROUTERS);
 	}
 
 	@Override

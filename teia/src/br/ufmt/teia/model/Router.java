@@ -7,6 +7,7 @@ public class Router {
 	private Integer id;
 	private String name;
 	private String MAC;
+	private Building building;
 	
 	public Router() {
 		super();
@@ -36,6 +37,14 @@ public class Router {
 		MAC = mAC;
 	}
 	
+	public Building getBuilding() {
+		return building;
+	}
+
+	public void setBuilding(Building building) {
+		this.building = building;
+	}
+
 	public List<Room> reaches(int minIntensity) {
 		// TODO 
 		return null;
