@@ -49,4 +49,11 @@ public class Router {
 		// TODO 
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "Router [id=" + id + ", name=" + name + ", MAC=" + MAC + "]";
+	}
+	
+	
 }

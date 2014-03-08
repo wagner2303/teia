@@ -10,6 +10,11 @@ import java.io.Writer;
 import java.util.Calendar;
 import java.util.List;
 
+import br.ufmt.teia.dao.PerceivedRouterDAO;
+import br.ufmt.teia.dao.RouterDAO;
+import br.ufmt.teia.model.PerceivedRouter;
+import br.ufmt.teia.model.Router;
+
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -19,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +32,7 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
+	protected static final String TAGBANCO = "TEIA DATABASE";
 	private boolean pediuStartScan = false;
 
 	@Override
@@ -58,6 +65,19 @@ public class MainActivity extends Activity {
 				int i = 0;
 				for (ScanResult scanResult : scanResults) {
 					txt.setText(txt.getText() + "\n" + scanResult.SSID + " -> " + WifiManager.calculateSignalLevel(scanResult.level, 1000) + ", " + scanResult.BSSID);
+
+					Router router = new RouterDAO(context).findByMAC(scanResult.BSSID);
+					if (router == null){
+						router = new Router();
+						router.setName(scanResult.SSID);
+						router.setMAC(scanResult.BSSID);
+					}
+					PerceivedRouter perceivedRouter = new PerceivedRouter();
+					perceivedRouter.setDate(Calendar.getInstance().getTimeInMillis() + (i++));
+					perceivedRouter.setSignalLevel(WifiManager.calculateSignalLevel(scanResult.level, 1000));
+					perceivedRouter.setRouter(router);
+					new PerceivedRouterDAO(context).save(perceivedRouter);
+					Log.i(TAGBANCO, "Saved " + perceivedRouter);
 					try {
 						writer.write((Calendar.getInstance().getTimeInMillis() % 1000 + i++) + "\"" + scanResult.SSID + "\", " + WifiManager.calculateSignalLevel(scanResult.level, 100) + "\n");
 					} catch (IOException e) {
@@ -75,7 +95,7 @@ public class MainActivity extends Activity {
 				pediuStartScan = false;
 			}
 		}, intentFilter);
-		
+
 		final Button button = (Button) findViewById(R.id.button1);
 		button.setOnClickListener(new View.OnClickListener() {
 
@@ -85,13 +105,13 @@ public class MainActivity extends Activity {
 				if (!pediuStartScan){
 					txt.setText("");
 					WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE); 
-				    pediuStartScan = wm.startScan(); 
-				    if (pediuStartScan)
-				    	txt.setText("Scan iniciado");
+					pediuStartScan = wm.startScan(); 
+					if (pediuStartScan)
+						txt.setText("Scan iniciado");
 				} else {
 					txt.setText("Scan já foi iniciado");
 				}
-					
+
 			}
 		});
 	}

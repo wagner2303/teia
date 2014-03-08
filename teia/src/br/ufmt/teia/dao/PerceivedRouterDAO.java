@@ -28,17 +28,17 @@ public class PerceivedRouterDAO {
 		ContentValues values = new ContentValues();
 		values.put(Names.PR_DATE, perceivedRouter.getDate());
 		values.put(Names.PR_SIGNALLEVEL, perceivedRouter.getSignalLevel());
-		if(perceivedRouter.getCodRoom() != null){
+		if(perceivedRouter.getRoom() != null){
 			RoomDAO dao = new RoomDAO(context);
-			if (dao.find(perceivedRouter.getCodRoom().getCodRoom()) == null)
-				dao.save(perceivedRouter.getCodRoom());
-			values.put(Names.RM_ID, perceivedRouter.getCodRoom().getCodRoom());
+			if (dao.find(perceivedRouter.getRoom().getCodRoom()) == null)
+				dao.save(perceivedRouter.getRoom());
+			values.put(Names.RM_ID, perceivedRouter.getRoom().getCodRoom());
 		}
-		if (perceivedRouter.getIdRouter() != null) {
+		if (perceivedRouter.getRouter() != null) {
 			RouterDAO dao = new RouterDAO(context);
-			if (dao.find(perceivedRouter.getIdRouter().getId()) == null)
-				dao.save(perceivedRouter.getIdRouter());
-			values.put(Names.RT_ID, perceivedRouter.getIdRouter().getId());
+			if (dao.find(perceivedRouter.getRouter().getId()) == null)
+				dao.save(perceivedRouter.getRouter());
+			values.put(Names.RT_ID, perceivedRouter.getRouter().getId());
 		}
 		database.insert(Names.PROUTERS, null, values);
 		databaseHelper.close();
@@ -66,8 +66,8 @@ public class PerceivedRouterDAO {
 			PerceivedRouter pr = new PerceivedRouter();
 			pr.setDate(c.getLong(c.getColumnIndex(Names.PR_DATE)));
 			pr.setSignalLevel(c.getInt(c.getColumnIndex(Names.PR_SIGNALLEVEL)));
-			pr.setCodRoom(roomDAO.find(c.getInt(c.getColumnIndex(Names.RM_ID))));
-			pr.setIdRouter(routerDAO.find(c.getInt(c.getColumnIndex(Names.RT_ID))));
+			pr.setRoom(roomDAO.find(c.getInt(c.getColumnIndex(Names.RM_ID))));
+			pr.setRouter(routerDAO.find(c.getInt(c.getColumnIndex(Names.RT_ID))));
 			list.add(pr);
 		} while (c.moveToNext());
 		databaseHelper.close();
@@ -85,8 +85,8 @@ public class PerceivedRouterDAO {
 		PerceivedRouter pr = new PerceivedRouter();
 		pr.setDate(c.getLong(c.getColumnIndex(Names.PR_DATE)));
 		pr.setSignalLevel(c.getInt(c.getColumnIndex(Names.PR_SIGNALLEVEL)));
-		pr.setCodRoom(new RoomDAO(context).find(c.getInt(c.getColumnIndex(Names.RM_ID))));
-		pr.setIdRouter(new RouterDAO(context).find(c.getInt(c.getColumnIndex(Names.RT_ID))));
+		pr.setRoom(new RoomDAO(context).find(c.getInt(c.getColumnIndex(Names.RM_ID))));
+		pr.setRouter(new RouterDAO(context).find(c.getInt(c.getColumnIndex(Names.RT_ID))));
 		databaseHelper.close();
 		return pr;
 	}
@@ -98,17 +98,17 @@ public class PerceivedRouterDAO {
 		ContentValues values = new ContentValues();
 		values.put(Names.PR_DATE, perceivedRouter.getDate());
 		values.put(Names.PR_SIGNALLEVEL, perceivedRouter.getSignalLevel());
-		if(perceivedRouter.getCodRoom() != null){
+		if(perceivedRouter.getRoom() != null){
 			RoomDAO dao = new RoomDAO(context);
-			if (dao.find(perceivedRouter.getCodRoom().getCodRoom()) == null)
-				dao.save(perceivedRouter.getCodRoom());
-			values.put(Names.RM_ID, perceivedRouter.getCodRoom().getCodRoom());
+			if (dao.find(perceivedRouter.getRoom().getCodRoom()) == null)
+				dao.save(perceivedRouter.getRoom());
+			values.put(Names.RM_ID, perceivedRouter.getRoom().getCodRoom());
 		}
-		if (perceivedRouter.getIdRouter() != null) {
+		if (perceivedRouter.getRouter() != null) {
 			RouterDAO dao = new RouterDAO(context);
-			if (dao.find(perceivedRouter.getIdRouter().getId()) == null)
-				dao.save(perceivedRouter.getIdRouter());
-			values.put(Names.RT_ID, perceivedRouter.getIdRouter().getId());
+			if (dao.find(perceivedRouter.getRouter().getId()) == null)
+				dao.save(perceivedRouter.getRouter());
+			values.put(Names.RT_ID, perceivedRouter.getRouter().getId());
 		}
 		int i = database.update(Names.PROUTERS, values, 
 				Names.PR_DATE + Names.EQ + perceivedRouter.getDate().toString(), null);

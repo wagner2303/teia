@@ -96,10 +96,16 @@ public class RouterDAO {
 	public Router find(Integer id) {
 		DatabaseHelper databaseHelper = new DatabaseHelper(context);
 		SQLiteDatabase database = databaseHelper.getReadableDatabase();
+		if (id == null) {
+			databaseHelper.close();
+			return null;
+		}
 		Cursor c = database.rawQuery(Names.SELECT + Names.ROUTERS
 				+ Names.WHERE + Names.RT_ID + Names.EQ + id.toString(), null);
-		if (!c.moveToFirst())
+		if (!c.moveToFirst()){
+			databaseHelper.close();
 			return null;
+		}
 		Router router = new Router();
 		router.setId(c.getInt(c.getColumnIndex(Names.RT_ID)));
 		router.setName(c.getString(c.getColumnIndex(Names.RT_NAME)));
@@ -128,5 +134,21 @@ public class RouterDAO {
 				Names.RT_ID + Names.EQ + router.getId().toString(), null);
 		databaseHelper.close();
 		return i;
+	}
+
+	public Router findByMAC(String bSSID) {
+		DatabaseHelper databaseHelper = new DatabaseHelper(context);
+		SQLiteDatabase database = databaseHelper.getReadableDatabase();
+		Cursor c = database.rawQuery(Names.SELECT + Names.ROUTERS
+				+ Names.WHERE + Names.RT_MAC + Names.EQ + "\'" + bSSID + "\'", null);
+		if (!c.moveToFirst())
+			return null;
+		Router router = new Router();
+		router.setId(c.getInt(c.getColumnIndex(Names.RT_ID)));
+		router.setName(c.getString(c.getColumnIndex(Names.RT_NAME)));
+		router.setMAC(c.getString(c.getColumnIndex(Names.RT_MAC)));
+		router.setBuilding(new BuildingDAO(context).find(c.getInt(c.getColumnIndex(Names.B_ID))));
+		databaseHelper.close();
+		return router;
 	}
 }

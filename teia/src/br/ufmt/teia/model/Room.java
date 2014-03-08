@@ -55,4 +55,11 @@ public class Room {
 	public void addNeighbor(Room neighbor) {
 		neighbors.add(neighbor);
 	}
+
+	@Override
+	public String toString() {
+		return "Room [codRoom=" + codRoom + ", nameRoom=" + nameRoom + "]";
+	}
+	
+	
 }

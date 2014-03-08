@@ -4,15 +4,15 @@ package br.ufmt.teia.model;
 public class PerceivedRouter {
 	
 	private Long date;
-	private Room codRoom;
-	private Router idRouter;
+	private Room room;
+	private Router router;
 	private Integer signalLevel;
 	
 	public PerceivedRouter(long date, Room codRoom, Router idRouter, int signalLevel) {
 		super();
 		this.date = date;
-		this.codRoom = codRoom;
-		this.idRouter = idRouter;
+		this.room = codRoom;
+		this.router = idRouter;
 		this.signalLevel = signalLevel;
 	}
 
@@ -23,12 +23,12 @@ public class PerceivedRouter {
 		return date;
 	}
 
-	public Room getCodRoom() {
-		return codRoom;
+	public Room getRoom() {
+		return room;
 	}
 
-	public Router getIdRouter() {
-		return idRouter;
+	public Router getRouter() {
+		return router;
 	}
 
 	public Integer getSignalLevel() {
@@ -39,17 +39,22 @@ public class PerceivedRouter {
 		this.date = date;
 	}
 
-	public void setCodRoom(Room codRoom) {
-		this.codRoom = codRoom;
+	public void setRoom(Room codRoom) {
+		this.room = codRoom;
 	}
 
-	public void setIdRouter(Router idRouter) {
-		this.idRouter = idRouter;
+	public void setRouter(Router idRouter) {
+		this.router = idRouter;
 	}
 
 	public void setSignalLevel(Integer signalLevel) {
 		this.signalLevel = signalLevel;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "PerceivedRouter [date=" + date + ", room=" + room + ", router="
+				+ router + ", signalLevel=" + signalLevel + "]";
+	}
 		
 }
