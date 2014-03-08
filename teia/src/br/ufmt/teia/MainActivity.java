@@ -11,8 +11,10 @@ import java.util.Calendar;
 import java.util.List;
 
 import br.ufmt.teia.dao.PerceivedRouterDAO;
+import br.ufmt.teia.dao.RoomDAO;
 import br.ufmt.teia.dao.RouterDAO;
 import br.ufmt.teia.model.PerceivedRouter;
+import br.ufmt.teia.model.Room;
 import br.ufmt.teia.model.Router;
 
 import android.net.wifi.ScanResult;
@@ -28,6 +30,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -62,7 +65,8 @@ public class MainActivity extends Activity {
 
 				final WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
 				final List<ScanResult> scanResults = wifiManager.getScanResults();
-				int i = 0;
+				
+				EditText editText = (EditText)findViewById(R.id.editText1);
 				for (ScanResult scanResult : scanResults) {
 					txt.setText(txt.getText() + "\n" + scanResult.SSID + " -> " + WifiManager.calculateSignalLevel(scanResult.level, 1000) + ", " + scanResult.BSSID);
 
@@ -72,14 +76,22 @@ public class MainActivity extends Activity {
 						router.setName(scanResult.SSID);
 						router.setMAC(scanResult.BSSID);
 					}
+
+					Room room = new RoomDAO(context).findByName(editText.getText().toString());
+					if (room == null) {
+						room = new Room();
+						room.setNameRoom(editText.getText().toString());
+					}
+					
 					PerceivedRouter perceivedRouter = new PerceivedRouter();
-					perceivedRouter.setDate(Calendar.getInstance().getTimeInMillis() + (i++));
+					perceivedRouter.setDate(Calendar.getInstance().getTimeInMillis());
 					perceivedRouter.setSignalLevel(WifiManager.calculateSignalLevel(scanResult.level, 1000));
 					perceivedRouter.setRouter(router);
+					perceivedRouter.setRoom(room);
 					new PerceivedRouterDAO(context).save(perceivedRouter);
 					Log.i(TAGBANCO, "Saved " + perceivedRouter);
 					try {
-						writer.write((Calendar.getInstance().getTimeInMillis() % 1000 + i++) + "\"" + scanResult.SSID + "\", " + WifiManager.calculateSignalLevel(scanResult.level, 100) + "\n");
+						writer.write((Calendar.getInstance().getTimeInMillis() % 1000) + "\"" + scanResult.SSID + "\", " + WifiManager.calculateSignalLevel(scanResult.level, 100) + "\n");
 					} catch (IOException e) {
 						txt.setText("ops");
 						continue;

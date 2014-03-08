@@ -70,10 +70,16 @@ public class RoomDAO {
 	public Room find(Integer id) {
 		DatabaseHelper databaseHelper = new DatabaseHelper(context);
 		SQLiteDatabase database = databaseHelper.getReadableDatabase();
+		if (id == null) {
+			databaseHelper.close();
+			return null;
+		}
 		Cursor c = database.rawQuery(Names.SELECT + Names.ROOMS
 				+ Names.WHERE + Names.RM_ID + Names.EQ + id.toString(), null);
-		if (!c.moveToFirst())
+		if (!c.moveToFirst()) {
+			databaseHelper.close();
 			return null;
+		}
 		Room room = new Room();
 		room.setCodRoom(c.getInt(c.getColumnIndex(Names.RM_ID)));
 		room.setNameRoom(c.getString(c.getColumnIndex(Names.RM_NAME)));
@@ -99,5 +105,20 @@ public class RoomDAO {
 				Names.RM_ID + Names.EQ + room.getCodRoom().toString(), null);
 		databaseHelper.close();
 		return i;
+	}
+
+	public Room findByName(String text) {
+		DatabaseHelper databaseHelper = new DatabaseHelper(context);
+		SQLiteDatabase database = databaseHelper.getReadableDatabase();
+		Cursor c = database.rawQuery(Names.SELECT + Names.ROOMS
+				+ Names.WHERE + Names.RM_NAME + Names.EQ + "\'" + text + "\'", null);
+		if (!c.moveToFirst())
+			return null;
+		Room room = new Room();
+		room.setCodRoom(c.getInt(c.getColumnIndex(Names.RM_ID)));
+		room.setNameRoom(c.getString(c.getColumnIndex(Names.RM_NAME)));
+		room.setBuilding(new BuildingDAO(context).find(c.getInt(c.getColumnIndex(Names.B_ID))));
+		databaseHelper.close();
+		return room;
 	}
 }
