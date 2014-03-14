@@ -49,62 +49,64 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				final TextView txt = (TextView)findViewById(R.id.textView1);
-				txt.setText("");
-				String NOMEARQUIVO = "data123456.txt";
+				if(pediuStartScan){
+					final TextView txt = (TextView)findViewById(R.id.textView1);
+					txt.setText("");
+					String NOMEARQUIVO = "data123456.txt";
 
-				File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_NOTIFICATIONS), NOMEARQUIVO);
-				FileOutputStream fileOutputStream = null;
-				try {
-					boolean append = true;
-					fileOutputStream = new FileOutputStream(file, append);
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				}
-				Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
-
-				final WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
-				final List<ScanResult> scanResults = wifiManager.getScanResults();
-				
-				EditText editText = (EditText)findViewById(R.id.editText1);
-				for (ScanResult scanResult : scanResults) {
-					txt.setText(txt.getText() + "\n" + scanResult.SSID + " -> " + WifiManager.calculateSignalLevel(scanResult.level, 1000) + ", " + scanResult.BSSID);
-
-					Router router = new RouterDAO(context).findByMAC(scanResult.BSSID);
-					if (router == null){
-						router = new Router();
-						router.setName(scanResult.SSID);
-						router.setMAC(scanResult.BSSID);
-					}
-
-					Room room = new RoomDAO(context).findByName(editText.getText().toString());
-					if (room == null) {
-						room = new Room();
-						room.setNameRoom(editText.getText().toString());
-					}
-					
-					PerceivedRouter perceivedRouter = new PerceivedRouter();
-					perceivedRouter.setDate(Calendar.getInstance().getTimeInMillis());
-					perceivedRouter.setSignalLevel(WifiManager.calculateSignalLevel(scanResult.level, 1000));
-					perceivedRouter.setRouter(router);
-					perceivedRouter.setRoom(room);
-					new PerceivedRouterDAO(context).save(perceivedRouter);
-					Log.i(TAGBANCO, "Saved " + perceivedRouter);
+					File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_NOTIFICATIONS), NOMEARQUIVO);
+					FileOutputStream fileOutputStream = null;
 					try {
-						writer.write((Calendar.getInstance().getTimeInMillis() % 1000) + "\"" + scanResult.SSID + "\", " + WifiManager.calculateSignalLevel(scanResult.level, 100) + "\n");
-					} catch (IOException e) {
-						txt.setText("ops");
-						continue;
+						boolean append = true;
+						fileOutputStream = new FileOutputStream(file, append);
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
 					}
-				}
+					Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
 
-				try {
-					writer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+					final WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+					final List<ScanResult> scanResults = wifiManager.getScanResults();
 
-				pediuStartScan = false;
+					EditText editText = (EditText)findViewById(R.id.editText1);
+					for (ScanResult scanResult : scanResults) {
+						txt.setText(txt.getText() + "\n" + scanResult.SSID + " -> " + WifiManager.calculateSignalLevel(scanResult.level, 1000) + ", " + scanResult.BSSID);
+
+						Router router = new RouterDAO(context).findByMAC(scanResult.BSSID);
+						if (router == null){
+							router = new Router();
+							router.setName(scanResult.SSID);
+							router.setMAC(scanResult.BSSID);
+						}
+
+						Room room = new RoomDAO(context).findByName(editText.getText().toString());
+						if (room == null) {
+							room = new Room();
+							room.setNameRoom(editText.getText().toString());
+						}
+
+						PerceivedRouter perceivedRouter = new PerceivedRouter();
+						perceivedRouter.setDate(Calendar.getInstance().getTimeInMillis());
+						perceivedRouter.setSignalLevel(WifiManager.calculateSignalLevel(scanResult.level, 1000));
+						perceivedRouter.setRouter(router);
+						perceivedRouter.setRoom(room);
+						new PerceivedRouterDAO(context).save(perceivedRouter);
+						Log.i(TAGBANCO, "Saved " + perceivedRouter);
+						try {
+							writer.write((Calendar.getInstance().getTimeInMillis() % 1000) + "\"" + scanResult.SSID + "\", " + WifiManager.calculateSignalLevel(scanResult.level, 100) + "\n");
+						} catch (IOException e) {
+							txt.setText("ops");
+							continue;
+						}
+					}
+
+					try {
+						writer.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					pediuStartScan = false;
+				}
 			}
 		}, intentFilter);
 
