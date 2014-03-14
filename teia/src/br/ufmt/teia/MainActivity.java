@@ -10,28 +10,36 @@ import java.io.Writer;
 import java.util.Calendar;
 import java.util.List;
 
-import br.ufmt.teia.dao.PerceivedRouterDAO;
-import br.ufmt.teia.dao.RoomDAO;
-import br.ufmt.teia.dao.RouterDAO;
-import br.ufmt.teia.model.PerceivedRouter;
-import br.ufmt.teia.model.Room;
-import br.ufmt.teia.model.Router;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.MLDataPair;
+import org.encog.neural.data.NeuralDataSet;
+import org.encog.neural.data.basic.BasicNeuralDataSet;
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.Train;
+import org.encog.neural.networks.training.propagation.back.Backpropagation;
 
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
-import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import br.ufmt.teia.dao.PerceivedRouterDAO;
+import br.ufmt.teia.dao.RoomDAO;
+import br.ufmt.teia.dao.RouterDAO;
+import br.ufmt.teia.model.PerceivedRouter;
+import br.ufmt.teia.model.Room;
+import br.ufmt.teia.model.Router;
 
 public class MainActivity extends Activity {
 
@@ -42,7 +50,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 		registerReceiver(new BroadcastReceiver() {
@@ -128,6 +136,52 @@ public class MainActivity extends Activity {
 
 			}
 		});
+		
+
+		double XOR_INPUT[][] = {
+			{0.0, 0.0},
+			{1.0, 0.0},
+			{0.0, 1.0},
+			{1.0, 1.0}
+		};
+
+		double IDEAL[][] = {
+			{0.0},
+			{1.0},
+			{1.0},
+			{0.0}
+		};
+		
+		BasicNetwork network = new BasicNetwork();
+		network.addLayer(new BasicLayer(2));
+		network.addLayer(new BasicLayer(2));
+		network.addLayer(new BasicLayer(1));
+
+		network.getStructure().finalizeStructure();
+		network.reset();
+
+		NeuralDataSet trainingSet = new BasicNeuralDataSet(XOR_INPUT, IDEAL);
+
+		final Train train = new Backpropagation(network, trainingSet);
+
+		int epoch = 1;
+		do {
+			train.iteration();
+			Log.d("Encog", "Iteração #" + epoch + " Error: " + train.getError());
+			epoch++;
+		} while (train.getError() > 0.01);
+
+
+		Log.d("Encog", "Neural Network Results");
+
+		for(MLDataPair pair: trainingSet ) {
+			final MLData output =
+					network.compute(pair.getInput());
+			Log.d("Encog",pair.getInput().getData(0)
+					+ "," + pair.getInput().getData(1)
+					+ ", actual=" + output.getData(0) + ",ideal=" +
+					pair.getIdeal().getData(0));
+		}
 	}
 
 
@@ -139,3 +193,5 @@ public class MainActivity extends Activity {
 	}
 
 }
+
+
